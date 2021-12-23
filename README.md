@@ -3,6 +3,7 @@ Small database migration library with `javax.inject` support.
 
 # Requirements
  - Java 17+
+ - [Reflections](https://github.com/ronmamo/reflections)
 
 # Usage
 ## Maven dependency
