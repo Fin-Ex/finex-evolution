@@ -25,6 +25,13 @@
         <reflections.version>0.10-RC1</reflections.version>
     </properties>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/Fin-Ex/finex-evolution</url>
+        </repository>
+    </distributionManagement>
+
     <dependencies>
         <dependency>
             <groupId>javax.inject</groupId>
