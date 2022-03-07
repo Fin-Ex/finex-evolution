@@ -33,8 +33,8 @@ public class MigrationDao {
 
     public void install() {
         try (Connection connection = dataSource.getConnection()) {
-            connection.setAutoCommit(false);
-            Savepoint savepoint = connection.setSavepoint();
+            boolean autoCommit = connection.getAutoCommit();
+            Savepoint savepoint = beginTrx(connection);
 
             try {
                 Statement statement = connection.createStatement();
@@ -42,15 +42,10 @@ public class MigrationDao {
                 statement.addBatch(MigrationConsts.MIGRATION_INDEX);
                 statement.executeBatch();
                 statement.close();
-            } catch (SQLException e) {
-                connection.rollback(savepoint);
-                connection.commit();
-                connection.setAutoCommit(true);
-                throw e;
+                savepoint = null;
+            } finally {
+                flushTrx(connection, savepoint, autoCommit);
             }
-
-            connection.commit();
-            connection.setAutoCommit(true);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -83,8 +78,8 @@ public class MigrationDao {
     @SuppressWarnings("checkstyle:NestedTryDepth")
     public void rollbackAndDeleteRecursive(String component, int version) {
         try (Connection connection = dataSource.getConnection()) {
-            connection.setAutoCommit(false);
-            Savepoint savepoint = connection.setSavepoint();
+            boolean autoCommit = connection.getAutoCommit();
+            Savepoint savepoint = beginTrx(connection);
 
             try {
                 List<String> queries = getDownQueriesByComponentAndUpperVersion(connection, component, version);
@@ -97,15 +92,10 @@ public class MigrationDao {
                 }
 
                 delete(connection, component, version);
-            } catch (SQLException e) {
-                connection.rollback(savepoint);
-                connection.commit();
-                connection.setAutoCommit(true);
-                throw e;
+                savepoint = null;
+            } finally {
+                flushTrx(connection, savepoint, autoCommit);
             }
-
-            connection.commit();
-            connection.setAutoCommit(true);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -159,21 +149,16 @@ public class MigrationDao {
 
     public void applyAndSave(MigrationData data, String checksum) {
         try (Connection connection = dataSource.getConnection()) {
-            connection.setAutoCommit(false);
-            Savepoint savepoint = connection.setSavepoint();
+            boolean autoCommit = connection.getAutoCommit();
+            Savepoint savepoint = beginTrx(connection);
 
             try {
                 apply(connection, data.getUpQueries());
                 save(connection, data, checksum);
-            } catch (SQLException e) {
-                connection.rollback(savepoint);
-                connection.commit();
-                connection.setAutoCommit(false);
-                throw e;
+                savepoint = null;
+            } finally {
+                flushTrx(connection, savepoint, autoCommit);
             }
-
-            connection.commit();
-            connection.setAutoCommit(false);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -207,6 +192,22 @@ public class MigrationDao {
             statement.setObject(4, gson.toJson(data.getUpQueries()));
             statement.setObject(5, gson.toJson(data.getDownQueries()));
             statement.execute();
+        }
+    }
+
+    private static Savepoint beginTrx(Connection connection) throws SQLException {
+        connection.setAutoCommit(false);
+        return connection.setSavepoint();
+    }
+
+    private static void flushTrx(Connection connection, Savepoint savepoint, boolean autoCommit) throws SQLException {
+        try {
+            if (savepoint != null) {
+                connection.rollback(savepoint);
+            }
+            connection.commit();
+        } finally {
+            connection.setAutoCommit(autoCommit);
         }
     }
 
