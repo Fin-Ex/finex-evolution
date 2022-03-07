@@ -3,7 +3,6 @@ Small database migration library with `javax.inject` support.
 
 # Requirements
  - Java 17+
- - [Reflections](https://github.com/ronmamo/reflections)
 
 # Usage
 ## Maven dependency
@@ -74,22 +73,92 @@ public class DbModule extends AbstractModule {
 }
 ```
 
-#### Reflections
-FinEx Evolution use reflections library to scan classpath resources to find migration scenarios and find all usages of `Evolution`.
+#### Classpath scanner
+FinEx Evolution require implementing classpath scanner to scan resources to find migration scenarios and find all usages of `Evolution`.
 Provide reflections with Guice:
 ```java
-public class ReflectionsModule extends AbstractModule {
-    
-    @Override 
-    protected void configure() {
-        bind(Reflections.class).toInstance(new Reflections(
-            new ConfigurationBuilder()
-                .setUrls(ClasspathHelper.forJavaClassPath())
-                .addScanners(Scanners.Resources)
-            )
-        );
+@Singleton
+public class ClasspathScannerImpl implements ClasspathScanner {
+
+    private final Reflections reflections;
+
+    @Inject
+    public ClasspathScannerImpl(Reflections reflections) {
+        this.reflections = reflections;
+    }
+
+    @Override
+    public Collection<Class<?>> getTypesAnnotatedWith(Class<? extends Annotation> annotation) {
+        return reflections.getTypesAnnotatedWith(annotation);
     }
     
+    @Override
+    public Collection<String> getResources(Pattern pattern) {
+        return reflections.getResources(pattern);
+    }
+    
+}
+```
+
+Or provide OSGi plugin classes:
+
+```java
+@Singleton
+public class ClasspathScannerImpl implements ClasspathScanner {
+
+    private final List<Class<?>> classes = new ArrayList<>();
+    private final List<String> resources = new ArrayList<>();
+
+    @Inject
+    public ClasspathScannerImpl(BundleContext context) {
+        Bundle bundle = context.getBundle();
+        BundleWiring wiring = bundle.adapt(BundleWiring.class);
+        Collection<String> resources = wiring.listResources("/", "*", BundleWiring.LISTRESOURCES_RECURSE);
+        for (String resource : resources) {
+            String resourceName = resource.replaceAll("/", ".");
+            if (resource.endsWith(".class")) {
+                String className = resourceName.substring(0, resourceName.length() - ".class".length());
+
+                Class<?> type;
+                try {
+                    type = Class.forName(className);
+                } catch (Exception e) {
+                    continue;
+                }
+
+                classes.add(type);
+            } else {
+                resources.add(resourceName);
+            }
+        }
+    }
+
+    @Override
+    public Collection<Class<?>> getTypesAnnotatedWith(Class<? extends Annotation> annotation) {
+        return classes.stream()
+            .filter(e -> e.getAnnotationsByType(annotation).length > 0)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public Collection<String> getResources(Pattern pattern) {
+        return resources.stream()
+            .filter(e -> pattern.matcher(e).find())
+            .collect(Collectors.toList());
+    }
+
+}
+```
+
+Module to bind implementation of classpath scanner:
+```java
+public class ClasspathModule extends AbstractModule {
+
+    @Override
+    protected void configure() {
+        bind(ClasspathScanner.class).to(ClasspathScannerImpl.class);
+    }
+
 }
 ```
 

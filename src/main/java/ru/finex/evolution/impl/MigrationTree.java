@@ -2,7 +2,7 @@ package ru.finex.evolution.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
-import org.reflections.Reflections;
+import ru.finex.evolution.ClasspathScanner;
 import ru.finex.evolution.Evolution;
 
 import java.util.LinkedList;
@@ -27,8 +27,8 @@ public class MigrationTree {
     private final int[] roots;
 
     @Inject
-    public MigrationTree(Reflections reflections) {
-        List<Evolution> evolutions = reflections.getTypesAnnotatedWith(Evolution.class)
+    public MigrationTree(ClasspathScanner scanner) {
+        List<Evolution> evolutions = scanner.getTypesAnnotatedWith(Evolution.class)
             .stream()
             .map(type -> type.getAnnotation(Evolution.class))
             .collect(Collectors.toList());

@@ -6,7 +6,7 @@ import com.google.common.collect.Multimaps;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.reflections.Reflections;
+import ru.finex.evolution.ClasspathScanner;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -30,11 +30,11 @@ public class MigrationParser {
     private static final Pattern PROCEDURE = Pattern.compile(";;");
     private static final Pattern END_QUERY = Pattern.compile(";");
 
-    private final Reflections reflections;
+    private final ClasspathScanner scanner;
 
     @SuppressWarnings("checkstyle:MissingJavadocMethod")
     public ListMultimap<String, MigrationData> parseAll() {
-        return reflections.getResources(FILE_PATTERN)
+        return scanner.getResources(FILE_PATTERN)
             .stream()
             .map(this::createMigration)
             .collect(Multimaps.toMultimap(
