@@ -2,7 +2,7 @@
 Small database migration library with `javax.inject` support.
 
 # Requirements
- - Java 17+
+ - Java 17+ (or Java 8 with port)
 
 # Usage
 ## Maven dependency
@@ -19,11 +19,21 @@ Small database migration library with `javax.inject` support.
 </repositories>
 ```
 ### Attach dependency to project
+Java 17+
 ```xml
 <dependency>
     <groupId>ru.finex</groupId>
     <artifactId>finex-evolution</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
+</dependency>
+```
+
+Java 8
+```xml
+<dependency>
+    <groupId>ru.finex</groupId>
+    <artifactId>finex-evolution</artifactId>
+    <version>1.1.j8</version>
 </dependency>
 ```
 
