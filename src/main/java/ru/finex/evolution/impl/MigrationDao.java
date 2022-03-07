@@ -52,12 +52,11 @@ public class MigrationDao {
     }
 
     public List<String> getChecksumsByComponent(String component) {
-        String query = """
-            select checksum
-            from db_evolutions
-            where component = ?
-            order by version asc
-        """;
+        String query =
+            "select checksum\n" +
+            "from db_evolutions\n" +
+            "where component = ?\n" +
+            "order by version asc";
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
@@ -103,12 +102,11 @@ public class MigrationDao {
     }
 
     private List<String> getDownQueriesByComponentAndUpperVersion(Connection connection, String component, int version) throws SQLException {
-        String query = """
-            select down_queries
-            from db_evolutions
-            where component = ? and version >= ?
-            order by version desc
-        """;
+        String query =
+            "select down_queries\n" +
+            "from db_evolutions\n" +
+            "where component = ? and version >= ?\n" +
+            "order by version desc";
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, component);
@@ -135,10 +133,9 @@ public class MigrationDao {
     }
 
     private void delete(Connection connection, String component, int version) throws SQLException {
-        String query = """
-            delete from db_evolutions
-            where component = ? and version >= ?
-        """;
+        String query =
+            "delete from db_evolutions\n" +
+            "where component = ? and version >= ?\n";
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, component);
@@ -175,15 +172,14 @@ public class MigrationDao {
     }
 
     private void save(Connection connection, MigrationData data, String checksum) throws SQLException {
-        String query = """
-            insert into db_evolutions(
-                component,
-                version,
-                checksum,
-                up_queries,
-                down_queries
-            ) values (?, ?, ?, ?::json, ?::json)
-        """;
+        String query =
+            "insert into db_evolutions(\n" +
+            "    component,\n" +
+            "    version,\n" +
+            "    checksum,\n" +
+            "    up_queries,\n" +
+            "    down_queries\n" +
+            ") values (?, ?, ?, ?::json, ?::json)";
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, data.getComponent());

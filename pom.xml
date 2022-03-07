@@ -6,14 +6,14 @@
 
     <groupId>ru.finex</groupId>
     <artifactId>finex-evolution</artifactId>
-    <version>1.1</version>
+    <version>1.1.j8</version>
 
     <name>FinEx Evolution</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <delombok.source>${project.build.directory}/delombok-sources</delombok.source>
 
         <lombok.version>1.18.20</lombok.version>
