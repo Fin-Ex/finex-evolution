@@ -25,7 +25,7 @@ Java 17+
 <dependency>
     <groupId>ru.finex</groupId>
     <artifactId>finex-evolution</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
 </dependency>
 ```
 
@@ -34,7 +34,7 @@ Java 8
 <dependency>
     <groupId>ru.finex</groupId>
     <artifactId>finex-evolution</artifactId>
-    <version>1.1.j8</version>
+    <version>1.2.j8</version>
 </dependency>
 ```
 

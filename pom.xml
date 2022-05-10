@@ -11,7 +11,7 @@
     <name>FinEx Evolution</name>
 
     <properties>
-        <evolution.version>1.1</evolution.version>
+        <evolution.version>1.2</evolution.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
