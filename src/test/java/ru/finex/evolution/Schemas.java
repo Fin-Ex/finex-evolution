@@ -11,7 +11,10 @@ public interface Schemas {
     @Evolution("auth")
     interface AuthSchema { }
 
-    @Evolution("logic")
+    @Evolution(value = "logic", dependencies = "auth")
     interface LogicSchema { }
+
+    @Evolution("logs")
+    interface LogSchema { }
 
 }

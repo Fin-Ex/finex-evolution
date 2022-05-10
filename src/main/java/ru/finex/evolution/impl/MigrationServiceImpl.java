@@ -63,11 +63,15 @@ public class MigrationServiceImpl implements MigrationService {
 
     @Override
     public void autoMigration(boolean autoRollback) {
-        migrationTree.applyOperation(component -> migrate(component, autoRollback));
+        migrationTree.applyOperation(component -> doMigration(component, autoRollback));
     }
 
     @Override
     public void migrate(String component, boolean autoRollback) {
+        migrationTree.applyOperation(component, e -> doMigration(e, autoRollback));
+    }
+
+    private void doMigration(String component, boolean autoRollback) {
         MessageDigest digest = createDigest();
         List<MigrationData> migrations = this.migrations.get(component);
         List<String> appliedChecksums = migrationDao.getChecksumsByComponent(component);

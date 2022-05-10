@@ -25,6 +25,6 @@ public @interface Evolution {
      * Зависимости от других компонентов.
      * @return зависимости
      */
-    String[] dependencies() default "core";
+    String[] dependencies() default {};
 
 }

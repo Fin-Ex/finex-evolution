@@ -5,6 +5,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import ru.finex.evolution.ClasspathScanner;
 import ru.finex.evolution.Evolution;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -113,6 +115,31 @@ public class MigrationTree {
             operation.accept(node.value);
 
         }
+    }
+
+    public void applyOperation(String nodeName, Consumer<String> operation) {
+        List<Integer> branches = new ArrayList<>();
+
+        int rootIndex = findIndex(nodeName);
+        if (rootIndex == -1) {
+            return;
+        }
+
+        Queue<Integer> awaitIndices = new LinkedList<>();
+        awaitIndices.add(rootIndex);
+        for (Integer index = awaitIndices.poll(); index != null; index = awaitIndices.poll()) {
+            branches.add(index);
+
+            Node node = nodes[index];
+            for (int dependency : node.dependencies) {
+                awaitIndices.add(dependency);
+            }
+        }
+
+        Collections.reverse(branches);
+        branches.stream()
+            .map(index -> nodes[index].value)
+            .forEachOrdered(operation);
     }
 
     @RequiredArgsConstructor

@@ -1,8 +1,8 @@
 # --- !Ups
 create table money_transactions(
     id serial primary key,
-    from_user_id int not null,
-    to_user_id int not null,
+    from_user_id int not null references users(id),
+    to_user_id int not null references users(id),
     amount numeric not null
 );
 

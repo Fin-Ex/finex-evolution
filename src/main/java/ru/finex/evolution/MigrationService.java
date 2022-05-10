@@ -12,7 +12,7 @@ public interface MigrationService {
     void autoMigration(boolean autoRollback);
 
     /**
-     * Миграция определенного компонента.
+     * Миграция определенного компонента и всех его зависимостей.
      * @param component компонент
      * @param autoRollback автоматический роллбек примененных миграций, если они изменились
      */
