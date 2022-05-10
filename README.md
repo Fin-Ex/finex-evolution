@@ -1,8 +1,9 @@
 # FinEx Evolution
-Small database migration library with `javax.inject` support.
+Small database migration library with `javax.inject` support with smells of [Play Evolutions](https://www.playframework.com/documentation/2.8.x/Evolutions).
 
 # Requirements
  - Java 17+ (or Java 8 with port)
+ - PostgreSQL 9.3+
 
 # Usage
 ## Maven dependency
@@ -228,9 +229,9 @@ create table pew(
 # --- !Downs
 drop table if exists pew;
 ```
-All SQL code within `# --- !Ups` is "apply" code to migration into specified schema version.
+All SQL code after `# --- !Ups` is "apply" code to migration into specified schema version.
 
-SQL code inside `# --- !Downs` is rollback code, they used in error cases, to example - migration has been failed by some reason, all changes what doing within it going to rollback with it code. 
+SQL code after `# --- !Downs` is rollback code, they used in error cases, to example - migration has been failed by some reason, all changes what doing within it going to rollback with it code. 
 Beware of write rollback code: migration can be partially executed!
 
 ### Execute migrations
