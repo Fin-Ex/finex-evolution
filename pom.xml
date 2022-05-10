@@ -6,7 +6,7 @@
 
     <groupId>ru.finex</groupId>
     <artifactId>finex-evolution</artifactId>
-    <version>${evolution.version}</version>
+    <version>${evolution.build-version}</version>
 
     <name>FinEx Evolution</name>
 
