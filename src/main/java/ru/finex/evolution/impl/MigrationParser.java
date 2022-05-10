@@ -77,13 +77,13 @@ public class MigrationParser {
             String line = lines[i];
 
             if (UP_PATTERN.matcher(line).matches()) {
-                if (!query.isEmpty()) {
+                if (query.length() != 0) {
                     queries.add(query.toString());
                     query.setLength(0);
                 }
                 queries = data.getUpQueries();
             } else if (DOWN_PATTERN.matcher(line).matches()) {
-                if (!query.isEmpty()) {
+                if (query.length() != 0) {
                     queries.add(query.toString());
                     query.setLength(0);
                 }
@@ -112,7 +112,7 @@ public class MigrationParser {
             }
         }
 
-        if (!query.isEmpty()) {
+        if (query.length() != 0) {
             queries.add(query.toString());
         }
     }

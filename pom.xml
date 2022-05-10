@@ -6,13 +6,14 @@
 
     <groupId>ru.finex</groupId>
     <artifactId>finex-evolution</artifactId>
-    <version>1.1</version>
+    <version>${evolution.version}</version>
 
     <name>FinEx Evolution</name>
 
     <properties>
+        <evolution.version>1.1</evolution.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <delombok.source>${project.build.directory}/delombok-sources</delombok.source>
 
@@ -32,6 +33,29 @@
         <reflections.version>0.10.2</reflections.version>
         <slf4j-simple.version>1.7.30</slf4j-simple.version>
     </properties>
+
+    <profiles>
+        <profile>
+            <id>j8</id>
+            <properties>
+                <evolution.build-version>${evolution.version}.j8</evolution.build-version>
+                <maven.compiler.target>1.8</maven.compiler.target>
+            </properties>
+            <activation>
+                <jdk>[1.8,17)</jdk>
+            </activation>
+        </profile>
+        <profile>
+            <id>default</id>
+            <properties>
+                <evolution.build-version>${evolution.version}</evolution.build-version>
+                <maven.compiler.target>17</maven.compiler.target>
+            </properties>
+            <activation>
+                <jdk>[17,)</jdk>
+            </activation>
+        </profile>
+    </profiles>
 
     <distributionManagement>
         <repository>
