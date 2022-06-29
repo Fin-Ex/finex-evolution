@@ -1,7 +1,8 @@
 package ru.finex.evolution.impl;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -23,7 +24,7 @@ import javax.sql.DataSource;
 @SuppressWarnings({"checkstyle:MissingJavadocMethod", "checkstyle:Indentation"})
 public class MigrationDao {
 
-    private final Gson gson = new Gson();
+    ObjectMapper mapper = new ObjectMapper();
     private final DataSource dataSource;
 
     @Inject
@@ -53,10 +54,10 @@ public class MigrationDao {
 
     public List<String> getChecksumsByComponent(String component) {
         String query =
-            "select checksum\n" +
-            "from db_evolutions\n" +
-            "where component = ?\n" +
-            "order by version asc";
+                "select checksum\n" +
+                        "from db_evolutions\n" +
+                        "where component = ?\n" +
+                        "order by version asc";
 
         try (Connection connection = dataSource.getConnection();
              PreparedStatement statement = connection.prepareStatement(query)) {
@@ -97,16 +98,18 @@ public class MigrationDao {
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
 
     }
 
-    private List<String> getDownQueriesByComponentAndUpperVersion(Connection connection, String component, int version) throws SQLException {
+    private List<String> getDownQueriesByComponentAndUpperVersion(Connection connection, String component, int version) throws SQLException, JsonProcessingException {
         String query =
-            "select down_queries\n" +
-            "from db_evolutions\n" +
-            "where component = ? and version >= ?\n" +
-            "order by version desc";
+                "select down_queries\n" +
+                        "from db_evolutions\n" +
+                        "where component = ? and version >= ?\n" +
+                        "order by version desc";
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, component);
@@ -114,15 +117,15 @@ public class MigrationDao {
             try (ResultSet results = statement.executeQuery()) {
                 if (!results.first()) {
                     throw new NullPointerException(String.format(
-                        "Down queries not found for %s component and %d version.",
-                        component, version
+                            "Down queries not found for %s component and %d version.",
+                            component, version
                     ));
                 }
                 List<String> result = new ArrayList<>();
                 while (results.next()) {
-                    List<String> queries = gson.fromJson(
-                        results.getString(1),
-                        new TypeToken<List<String>>() { }.getType()
+                    List<String> queries = mapper.readValue(
+                            results.getString(1),
+                            new TypeReference<List<String>>() {}
                     );
                     result.addAll(queries);
                 }
@@ -134,8 +137,8 @@ public class MigrationDao {
 
     private void delete(Connection connection, String component, int version) throws SQLException {
         String query =
-            "delete from db_evolutions\n" +
-            "where component = ? and version >= ?\n";
+                "delete from db_evolutions\n" +
+                        "where component = ? and version >= ?\n";
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, component);
@@ -158,6 +161,8 @@ public class MigrationDao {
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -171,22 +176,22 @@ public class MigrationDao {
         }
     }
 
-    private void save(Connection connection, MigrationData data, String checksum) throws SQLException {
+    private void save(Connection connection, MigrationData data, String checksum) throws SQLException, JsonProcessingException {
         String query =
-            "insert into db_evolutions(\n" +
-            "    component,\n" +
-            "    version,\n" +
-            "    checksum,\n" +
-            "    up_queries,\n" +
-            "    down_queries\n" +
-            ") values (?, ?, ?, ?::json, ?::json)";
+                "insert into db_evolutions(\n" +
+                        "    component,\n" +
+                        "    version,\n" +
+                        "    checksum,\n" +
+                        "    up_queries,\n" +
+                        "    down_queries\n" +
+                        ") values (?, ?, ?, ?::json, ?::json)";
 
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, data.getComponent());
             statement.setInt(2, data.getVersion());
             statement.setString(3, checksum);
-            statement.setObject(4, gson.toJson(data.getUpQueries()));
-            statement.setObject(5, gson.toJson(data.getDownQueries()));
+            statement.setObject(4, mapper.writeValueAsString(data.getUpQueries()));
+            statement.setObject(5, mapper.writeValueAsString(data.getDownQueries()));
             statement.execute();
         }
     }
