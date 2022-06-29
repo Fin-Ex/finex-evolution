@@ -24,7 +24,7 @@ import javax.sql.DataSource;
 @SuppressWarnings({"checkstyle:MissingJavadocMethod", "checkstyle:Indentation"})
 public class MigrationDao {
 
-    ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper();
     private final DataSource dataSource;
 
     @Inject
