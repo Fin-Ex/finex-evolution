@@ -115,12 +115,7 @@ public class MigrationDao {
             statement.setString(1, component);
             statement.setInt(2, version);
             try (ResultSet results = statement.executeQuery()) {
-                if (!results.first()) {
-                    throw new NullPointerException(String.format(
-                            "Down queries not found for %s component and %d version.",
-                            component, version
-                    ));
-                }
+                boolean hasResult = false;
                 List<String> result = new ArrayList<>();
                 while (results.next()) {
                     List<String> queries = mapper.readValue(
@@ -128,6 +123,14 @@ public class MigrationDao {
                             new TypeReference<List<String>>() {}
                     );
                     result.addAll(queries);
+                    hasResult = true;
+                }
+
+                if (!hasResult) {
+                    throw new NullPointerException(String.format(
+                        "Down queries not found for %s component and %d version.",
+                        component, version
+                    ));
                 }
 
                 return result;
