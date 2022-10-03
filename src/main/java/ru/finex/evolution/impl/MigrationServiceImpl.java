@@ -23,8 +23,6 @@ import javax.inject.Singleton;
 @Singleton
 public class MigrationServiceImpl implements MigrationService {
 
-    private static final String AUTO_ROLLBACK_FLAG = "--evolution-auto-rollback";
-
     private final ListMultimap<String, MigrationData> migrations;
     private final MigrationDao migrationDao;
     private final MigrationTree migrationTree;
@@ -96,10 +94,9 @@ public class MigrationServiceImpl implements MigrationService {
                     migrationDao.rollbackAndDeleteRecursive(component, data.getVersion());
                 } else {
                     throw new RuntimeException(String.format(
-                        "Evolution %s has changes! To enable auto rollback and deploy use '%s'",
+                        "Evolution %s has changes!",
                         Optional.ofNullable(data.getName())
-                            .orElseGet(() -> getEvolutionFilename(data)),
-                        AUTO_ROLLBACK_FLAG
+                            .orElseGet(() -> getEvolutionFilename(data))
                     ));
                 }
                 isRollback = true;
