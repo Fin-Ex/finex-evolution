@@ -2,7 +2,7 @@
 Small database migration library with `javax.inject` support with smells of [Play Evolutions](https://www.playframework.com/documentation/2.8.x/Evolutions).
 
 # Requirements
- - Java 17+ (or Java 8 with port)
+ - Java 8+
  - PostgreSQL 9.3+
 
 # Usage
@@ -20,21 +20,11 @@ Small database migration library with `javax.inject` support with smells of [Pla
 </repositories>
 ```
 ### Attach dependency to project
-Java 17+
 ```xml
 <dependency>
     <groupId>ru.finex</groupId>
     <artifactId>finex-evolution</artifactId>
-    <version>1.2</version>
-</dependency>
-```
-
-Java 8
-```xml
-<dependency>
-    <groupId>ru.finex</groupId>
-    <artifactId>finex-evolution</artifactId>
-    <version>1.2.j8</version>
+    <version>1.4</version>
 </dependency>
 ```
 
