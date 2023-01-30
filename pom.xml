@@ -9,7 +9,9 @@
     <version>1.4</version>
 
     <name>FinEx Evolution</name>
-
+    <description>Database migration library with smell of Play Evolutions.</description>
+    <url>https://github.com/Fin-Ex/finex-evolution</url>
+    
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -253,4 +255,17 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://github.com/Fin-Ex/finex-evolution</url>
+    </scm>
+
 </project>
